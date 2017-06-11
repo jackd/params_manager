@@ -15,7 +15,19 @@ def _save(path, params):
 
 
 class ParamsManager(object):
+    """A class for managering parameter sets."""
+
     def __init__(self, folder, default_params=None, default_name='default'):
+        """
+        Initialize the manager.
+
+        Args:
+            folder: folder under which this manager loads/saves parameters.
+            default_params: default parameters. Can be None only if folder
+                has a default.json file.
+            default_name: name of default params file. Only used if
+                default_params is None.
+        """
         self._folder = folder
         if default_params is None:
             default_params = self.load(default_name)
@@ -23,16 +35,19 @@ class ParamsManager(object):
 
     @property
     def folder(self):
+        """Get the model this manager looks for json files in."""
         return self._folder
 
     @property
     def default_params(self):
+        """Get default parameters for this manager."""
         return self._default_params.copy()
 
     def load(self, model_name):
+        """Load parameters for the specified model."""
         path = self._path(model_name)
         if not os.path.isfile(path):
-            raise IOError('No file at %s for model %s' % path, model_name)
+            raise IOError('No file at %s for model %s' % (path, model_name))
         else:
             return _load(path)
 
