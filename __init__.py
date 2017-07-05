@@ -32,7 +32,7 @@ class ParamsManager(object):
     def load(self, model_name):
         path = self._path(model_name)
         if not os.path.isfile(path):
-            raise IOError('No file at %s for model %s' % path, model_name)
+            raise IOError('No file at %s for model %s' % (path, model_name))
         else:
             return _load(path)
 
