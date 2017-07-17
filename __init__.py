@@ -17,19 +17,18 @@ def _save(path, params):
 class ParamsManager(object):
     """A class for managering parameter sets."""
 
-    def __init__(self, folder, default_params=None, default_name='default'):
+    def __init__(self, folder, default_params=None, default_name=None):
         """
         Initialize the manager.
 
         Args:
             folder: folder under which this manager loads/saves parameters.
-            default_params: default parameters. Can be None only if folder
-                has a default.json file.
+            default_params: default parameters. Can be None.
             default_name: name of default params file. Only used if
-                default_params is None.
+                default_params is None. Can be None.
         """
         self._folder = folder
-        if default_params is None:
+        if default_params is None and default_name is not None:
             default_params = self.load(default_name)
         self._default_params = default_params
 
@@ -41,6 +40,8 @@ class ParamsManager(object):
     @property
     def default_params(self):
         """Get default parameters for this manager."""
+        if self._default_params is None:
+            return None
         return self._default_params.copy()
 
     def load(self, model_name):
@@ -65,14 +66,16 @@ class ParamsManager(object):
         Returns False if params were present and were consistent.
         Raises IOError if parameters already existed and `overwrite` is False
         """
-        for k in params:
-            if k not in self._default_params:
-                raise Exception(
-                    'key %s not in default_params keys. Possible keys are %s' %
-                    (k, str(list([k for k in self._default_params]))))
-        for k in self._default_params:
-            if k not in params:
-                params[k] = self._default_params[k]
+        if self._default_params is not None:
+            for k in params:
+                if k not in self._default_params:
+                    raise Exception(
+                        'key %s not in default_params keys. '
+                        'Possible keys are %s' %
+                        (k, str(list([k for k in self._default_params]))))
+            for k in self._default_params:
+                if k not in params:
+                    params[k] = self._default_params[k]
         path = self._path(model_name)
         if os.path.isfile(path):
             old_params = _load(path)
